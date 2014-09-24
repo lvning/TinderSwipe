@@ -1,5 +1,7 @@
 package com.yiqivr.tinderswipe.widget;
 
+import com.yiqivr.tinderswipe.R;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.util.Log;
@@ -7,6 +9,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageView;
 
 public class FlingCardListener implements View.OnTouchListener {
 
@@ -62,6 +65,8 @@ public class FlingCardListener implements View.OnTouchListener {
 //		Log.i("", "========================");
 //		Log.i("", "parentWidth = " + parentWidth);
 //		Log.i("", "parentHeight = " + parentHeight);
+//		Log.i("", "originalWidth = " + originalWidth);
+//		Log.i("", "originalHeight = " + originalHeight);
 //		Log.i("", "halfWidth = " + halfWidth);
 //		Log.i("", "halfHeight = " + halfHeight);
 //		Log.i("", "========================");
@@ -181,7 +186,7 @@ public class FlingCardListener implements View.OnTouchListener {
 	}
 
 	protected void setUpNextFrame(float scalePercent, boolean withAnim) {
-		if(nextFrame == null)
+		if (nextFrame == null)
 			return;
 		if (!withAnim) {
 			nextFrame.setScaleX(scalePercent);
@@ -265,7 +270,7 @@ public class FlingCardListener implements View.OnTouchListener {
 						helperFlingListener.onCardExited();
 						helperFlingListener.topExit(dataObject);
 					}
-				}).rotation(-getExitRotation());
+				});
 	}
 
 	public void onRightSelected() {
@@ -284,10 +289,11 @@ public class FlingCardListener implements View.OnTouchListener {
 				.y(originalHeight).setListener(new AnimatorListenerAdapter() {
 					@Override
 					public void onAnimationEnd(Animator animation) {
+
 						helperFlingListener.onCardExited();
 						helperFlingListener.bottomExit(dataObject);
 					}
-				}).rotation(getExitRotation());
+				});
 	}
 
 	private float getExitPoint(int exitXPoint) {

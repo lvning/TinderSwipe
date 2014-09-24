@@ -255,7 +255,7 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView implements Helpe
 			
 		}
 	}
-
+	
 	public void setMaxVisible(int maxVisible) {
 		this.maxVisible = maxVisible;
 	}

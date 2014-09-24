@@ -2,13 +2,18 @@ package com.yiqivr.tinderswipe;
 
 import java.util.ArrayList;
 
+import android.R.animator;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +26,7 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 
 	private ArrayList<String> al;
 	private MyAdapter adapter;
+	private TextView boxPic;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +34,7 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 		setContentView(R.layout.activity_my);
 
 		SwipeFlingAdapterView flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
+		boxPic = (TextView) findViewById(R.id.boxpic);
 
 		al = new ArrayList<String>();
 		al.add("1");
@@ -79,6 +86,19 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 	@Override
 	public void onBottomCardExit(Object dataObject) {
 		Toast.makeText(this, "Swipe Bottom:" + dataObject.toString(), Toast.LENGTH_SHORT).show();
+		boxPic.setBackgroundResource(Integer.valueOf(dataObject.toString()) % 2 == 0 ? R.drawable.card
+				: R.drawable.card2);
+		boxPic.setText(dataObject.toString());
+
+		ObjectAnimator transAnim = ObjectAnimator.ofFloat(boxPic, "translationY", 150f, 0f);
+		transAnim.setInterpolator(new OvershootInterpolator());
+		transAnim.setDuration(250);
+		ObjectAnimator rotateAnim = ObjectAnimator.ofFloat(boxPic, "rotation", 0f, -10f);
+		rotateAnim.setInterpolator(new OvershootInterpolator());
+		rotateAnim.setDuration(150);
+		AnimatorSet animSet = new AnimatorSet();
+		animSet.playTogether(rotateAnim, transAnim);
+		animSet.start();
 	}
 
 	private class MyAdapter extends BaseAdapter {
