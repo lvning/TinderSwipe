@@ -20,7 +20,6 @@ import com.yiqivr.tinderswipe.widget.SwipeFlingAdapterView;
 public class MyActivity extends Activity implements OnLeftRightFlingListener, OnTopBottomFlingListener {
 
 	private ArrayList<String> al;
-//	private ArrayAdapter<String> arrayAdapter;
 	private MyAdapter adapter;
 
 	@Override
@@ -39,12 +38,11 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 		al.add("6");
 		al.add("7");
 		al.add("8");
-//
-//		arrayAdapter = new ArrayAdapter<String>(this, R.layout.item, R.id.helloText, al);
 
 		flingContainer.setSwipeMode(SWIPEMODE.UP_DOWN);
+		flingContainer.setMaxVisible(2);
 		flingContainer.setTopBottomFlingListener(this);
-		flingContainer.setLeftRightFlingListener(this);
+//		flingContainer.setLeftRightFlingListener(this);
 		adapter = new MyAdapter();
 		flingContainer.setAdapter(adapter);
 	}

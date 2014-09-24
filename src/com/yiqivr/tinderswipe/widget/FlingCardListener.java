@@ -181,6 +181,8 @@ public class FlingCardListener implements View.OnTouchListener {
 	}
 
 	protected void setUpNextFrame(float scalePercent, boolean withAnim) {
+		if(nextFrame == null)
+			return;
 		if (!withAnim) {
 			nextFrame.setScaleX(scalePercent);
 			nextFrame.setScaleY(scalePercent);

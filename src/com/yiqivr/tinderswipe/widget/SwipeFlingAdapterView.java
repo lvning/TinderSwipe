@@ -14,7 +14,7 @@ import com.yiqivr.tinderswipe.widget.FlingCardListener.SWIPEMODE;
 public class SwipeFlingAdapterView extends BaseFlingAdapterView implements HelperFlingListener {
 
 	private Adapter mAdapter;
-	private int maxVisible = 2;
+	private int maxVisible = 4;
 	private int minAdapterStack = 6;
 	private int lastObjectInStack = 0;
 	private OnLeftRightFlingListener lrFlingListener;
@@ -240,9 +240,12 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView implements Helpe
 
 	private void setTopView() {
 		if (getChildCount() > 0) {
-			Log.d("", "lastObjectInStack = " + lastObjectInStack);
+//			Log.d("", "lastObjectInStack = " + lastObjectInStack);
 			View tv = getChildAt(lastObjectInStack);
-			View nextTv = getChildAt(lastObjectInStack - 1);
+			View nextTv = null;
+			if(getChildCount() > 1){
+				nextTv = getChildAt(lastObjectInStack - 1);
+			}
 			
 			if (tv != null) {
 				FlingCardListener flingCardListener = new FlingCardListener(swipeMode, tv, nextTv, getWidth(),
