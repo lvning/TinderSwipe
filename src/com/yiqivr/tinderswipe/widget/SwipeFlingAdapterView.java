@@ -170,9 +170,11 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView implements Helpe
 	private void addAndMeasureChild(View child) {
 
 		FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) child.getLayoutParams();
-		if (lp == null)
-			lp = new FrameLayout.LayoutParams(android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
-					android.widget.FrameLayout.LayoutParams.MATCH_PARENT);
+		if (lp == null){
+			lp = new FrameLayout.LayoutParams(android.widget.FrameLayout.LayoutParams.WRAP_CONTENT,
+					android.widget.FrameLayout.LayoutParams.WRAP_CONTENT);
+			lp.gravity = Gravity.CENTER;
+		}
 
 		addViewInLayout(child, 0, lp, true);
 

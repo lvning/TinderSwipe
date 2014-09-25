@@ -24,7 +24,7 @@
         android:layout_height="50dp"
         android:layout_alignTop="@id/helloText"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="-20dp"
+        android:layout_marginBottom="-30dp"
         lv:backColor="@android:color/black"
         lv:centerPic="@drawable/recommend_app_icon"
         lv:foreColor="@color/green" />

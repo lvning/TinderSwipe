@@ -202,10 +202,10 @@ public class FlingCardListener implements View.OnTouchListener {
 				resetOrigin();
 			}
 		} else {
-			if (distOriginalY > originalHeight / 4) {
+			if (distOriginalY > originalHeight / 2) {
 				setUpNextFrame(1f, true);
 				onBottomSelected();
-			} else if (distOriginalY < 0 && Math.abs(distOriginalY) > originalHeight / 4) {
+			} else if (distOriginalY < 0 && Math.abs(distOriginalY) > originalHeight / 2) {
 				setUpNextFrame(1f, true);
 				onTopSelected();
 			} else {
@@ -215,7 +215,7 @@ public class FlingCardListener implements View.OnTouchListener {
 	}
 
 	public int getMoveDisPercent() {
-		return (int) (Math.min(1f, Math.abs((aPosY - originalY)) / (originalHeight / 4)) * 100);
+		return (int) (Math.min(1f, Math.abs((aPosY - originalY)) / (originalHeight / 2)) * 100);
 	}
 
 	protected void resetOrigin() {
@@ -275,7 +275,7 @@ public class FlingCardListener implements View.OnTouchListener {
 
 	public void onBottomSelected() {
 		this.frame.animate().setDuration(100).setInterpolator(new AccelerateInterpolator()).x(originalX)
-				.y(originalHeight).setListener(new AnimatorListenerAdapter() {
+				.y(3 * originalHeight).setListener(new AnimatorListenerAdapter() {
 					@Override
 					public void onAnimationEnd(Animator animation) {
 
