@@ -1,15 +1,12 @@
 package com.yiqivr.tinderswipe.widget;
 
-import com.yiqivr.tinderswipe.R;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageView;
+import android.view.animation.OvershootInterpolator;
 
 public class FlingCardListener implements View.OnTouchListener {
 
@@ -19,7 +16,7 @@ public class FlingCardListener implements View.OnTouchListener {
 	private final int originalWidth;
 	private final int halfWidth, halfHeight;
 	private final int parentWidth, parentHeight;
-	private final HelperFlingListener helperFlingListener;
+	private final HelperFlingWithProportionListener helperFlingListener;
 	private final Object dataObject;
 	private float BASE_ROTATION_DEGREES = 15.f;
 
@@ -47,7 +44,7 @@ public class FlingCardListener implements View.OnTouchListener {
 
 	public FlingCardListener(SWIPEMODE swipeMode, View frame, View nextFrame, int parentWidth, int parentHeight,
 			float originalX, float originalY, int originalHeight, int originalWidth, Object itemAtPosition,
-			HelperFlingListener helperFlingListener) {
+			HelperFlingWithProportionListener helperFlingListener) {
 		super();
 		this.swipeMode = swipeMode;
 		this.frame = frame;
@@ -62,14 +59,6 @@ public class FlingCardListener implements View.OnTouchListener {
 		this.halfHeight = this.originalHeight / 2;
 		this.dataObject = itemAtPosition;
 		this.helperFlingListener = helperFlingListener;
-//		Log.i("", "========================");
-//		Log.i("", "parentWidth = " + parentWidth);
-//		Log.i("", "parentHeight = " + parentHeight);
-//		Log.i("", "originalWidth = " + originalWidth);
-//		Log.i("", "originalHeight = " + originalHeight);
-//		Log.i("", "halfWidth = " + halfWidth);
-//		Log.i("", "halfHeight = " + halfHeight);
-//		Log.i("", "========================");
 	}
 
 	@Override
@@ -160,7 +149,7 @@ public class FlingCardListener implements View.OnTouchListener {
 				scalePercent = 1;
 			setUpNextFrame(scalePercent, false);
 
-			// 暂时不加旋转
+			// no rotation for a while.
 //			float degree = (float) (Math.atan((aPosY - originalY) / (aPosX - originalX)) / Math.PI * 180);
 //			Log.d("", "degree = " + degree + ", distOriginalX = " + distOriginalX);
 //			float result;
@@ -174,6 +163,9 @@ public class FlingCardListener implements View.OnTouchListener {
 
 			frame.setX(aPosX);
 			frame.setY(aPosY);
+
+			helperFlingListener.flingOccurPercent(frame, getMoveDisPercent(), distOriginalY < 0);
+
 			break;
 
 		case MotionEvent.ACTION_CANCEL: {
@@ -198,6 +190,7 @@ public class FlingCardListener implements View.OnTouchListener {
 	}
 
 	private void resetCardViewOnStack() {
+		float distOriginalY = aPosY - originalY;
 		if (swipeMode == SWIPEMODE.LEFT_RIGHT) {
 			if (aPosX + halfWidth > rightBorder()) {
 				setUpNextFrame(1f, true);
@@ -209,17 +202,20 @@ public class FlingCardListener implements View.OnTouchListener {
 				resetOrigin();
 			}
 		} else {
-			if (aPosY + halfHeight > bottomBorder()) {
+			if (distOriginalY > originalHeight / 4) {
 				setUpNextFrame(1f, true);
 				onBottomSelected();
-			} else if (aPosY + halfHeight < topBorder()) {
+			} else if (distOriginalY < 0 && Math.abs(distOriginalY) > originalHeight / 4) {
 				setUpNextFrame(1f, true);
 				onTopSelected();
 			} else {
 				resetOrigin();
 			}
 		}
+	}
 
+	public int getMoveDisPercent() {
+		return (int) (Math.min(1f, Math.abs((aPosY - originalY)) / (originalHeight / 4)) * 100);
 	}
 
 	protected void resetOrigin() {
@@ -227,8 +223,9 @@ public class FlingCardListener implements View.OnTouchListener {
 		aPosY = 0;
 		aDownTouchX = 0;
 		aDownTouchY = 0;
-		frame.animate().setDuration(100).setInterpolator(new DecelerateInterpolator()).x(originalX).y(originalY)
+		frame.animate().setDuration(100).setInterpolator(new OvershootInterpolator()).x(originalX).y(originalY)
 				.rotation(0);
+		helperFlingListener.flingResetOrigin(frame);
 	}
 
 	public float leftBorder() {
@@ -237,14 +234,6 @@ public class FlingCardListener implements View.OnTouchListener {
 
 	public float rightBorder() {
 		return 3 * parentWidth / 4.f;
-	}
-
-	public float bottomBorder() {
-		return 3 * parentHeight / 4.f;
-	}
-
-	public float topBorder() {
-		return parentHeight / 4.f;
 	}
 
 	public void setRotationDegrees(float degrees) {

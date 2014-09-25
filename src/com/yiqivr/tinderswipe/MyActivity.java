@@ -17,12 +17,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.yiqivr.tinderswipe.widget.CircleProgress;
 import com.yiqivr.tinderswipe.widget.FlingCardListener.SWIPEMODE;
 import com.yiqivr.tinderswipe.widget.OnLeftRightFlingListener;
 import com.yiqivr.tinderswipe.widget.OnTopBottomFlingListener;
+import com.yiqivr.tinderswipe.widget.OnTopBottomFlingWithProportionListener;
 import com.yiqivr.tinderswipe.widget.SwipeFlingAdapterView;
 
-public class MyActivity extends Activity implements OnLeftRightFlingListener, OnTopBottomFlingListener {
+public class MyActivity extends Activity implements OnLeftRightFlingListener, OnTopBottomFlingWithProportionListener {
 
 	private ArrayList<String> al;
 	private MyAdapter adapter;
@@ -37,14 +39,9 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 		boxPic = (TextView) findViewById(R.id.boxpic);
 
 		al = new ArrayList<String>();
-		al.add("1");
-		al.add("2");
-		al.add("3");
-		al.add("4");
-		al.add("5");
-		al.add("6");
-		al.add("7");
-		al.add("8");
+		for (int i = 1; i < 20; i++) {
+			al.add(i + "");
+		}
 
 		flingContainer.setSwipeMode(SWIPEMODE.UP_DOWN);
 		flingContainer.setMaxVisible(2);
@@ -79,13 +76,12 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 
 	@Override
 	public void onTopCardExit(Object dataObject) {
-		Toast.makeText(this, "Swipe Top:" + dataObject.toString(), Toast.LENGTH_SHORT).show();
-
+//		Toast.makeText(this, "Swipe Top:" + dataObject.toString(), Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
 	public void onBottomCardExit(Object dataObject) {
-		Toast.makeText(this, "Swipe Bottom:" + dataObject.toString(), Toast.LENGTH_SHORT).show();
+//		Toast.makeText(this, "Swipe Bottom:" + dataObject.toString(), Toast.LENGTH_SHORT).show();
 		boxPic.setBackgroundResource(Integer.valueOf(dataObject.toString()) % 2 == 0 ? R.drawable.card
 				: R.drawable.card2);
 		boxPic.setText(dataObject.toString());
@@ -93,7 +89,7 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 		ObjectAnimator transAnim = ObjectAnimator.ofFloat(boxPic, "translationY", 150f, 0f);
 		transAnim.setInterpolator(new OvershootInterpolator());
 		transAnim.setDuration(250);
-		ObjectAnimator rotateAnim = ObjectAnimator.ofFloat(boxPic, "rotation", 0f, -10f);
+		ObjectAnimator rotateAnim = ObjectAnimator.ofFloat(boxPic, "rotation", 0f, -5f);
 		rotateAnim.setInterpolator(new OvershootInterpolator());
 		rotateAnim.setDuration(150);
 		AnimatorSet animSet = new AnimatorSet();
@@ -123,13 +119,66 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
+			Log.v("", "getView--------");
 			View v = LayoutInflater.from(MyActivity.this).inflate(R.layout.item, null);
 			TextView tv = (TextView) v.findViewById(R.id.helloText);
 			tv.setBackgroundResource(Integer.valueOf(al.get(position)) % 2 == 0 ? R.drawable.card : R.drawable.card2);
 			tv.setText(al.get(position));
+			CircleProgress top = (CircleProgress) v.findViewById(R.id.top_progress);
+			CircleProgress bottom = (CircleProgress) v.findViewById(R.id.bottom_progress);
+			top.setTag(0);
+			bottom.setTag(0);
+			top.setAlpha(0);
+			bottom.setAlpha(0);
 			return v;
 		}
 
+	}
+
+	@Override
+	public void onFlingSuccessPercent(View selfView, int percent, boolean flingTop) {
+		CircleProgress top = (CircleProgress) selfView.findViewById(R.id.top_progress);
+		CircleProgress bottom = (CircleProgress) selfView.findViewById(R.id.bottom_progress);
+		if (top != null && bottom != null) {
+			if (flingTop) {
+				if ((Integer) top.getTag() == 0) {
+					top.setTag(1);
+					top.animate().alpha(1).setDuration(500l);
+				}
+				if ((Integer) bottom.getTag() == 1) {
+					bottom.setTag(0);
+					bottom.setCurProgress(0);
+					bottom.animate().alpha(0).setDuration(500l);
+				}
+				top.setCurProgress(percent);
+			} else {
+				if ((Integer) top.getTag() == 1) {
+					top.setTag(0);
+					top.setCurProgress(0);
+					top.animate().alpha(0).setDuration(500l);
+				}
+				if ((Integer) bottom.getTag() == 0) {
+					bottom.setTag(1);
+					bottom.animate().alpha(1).setDuration(500l);
+				}
+				bottom.setCurProgress(percent);
+			}
+		}
+
+	}
+
+	@Override
+	public void onFlingResetOrigin(View selfView) {
+		CircleProgress top = (CircleProgress) selfView.findViewById(R.id.top_progress);
+		CircleProgress bottom = (CircleProgress) selfView.findViewById(R.id.bottom_progress);
+		if ((Integer) top.getTag() == 1) {
+			top.setTag(0);
+			top.animate().alpha(0).setDuration(500l);
+		}
+		if ((Integer) bottom.getTag() == 1) {
+			bottom.setTag(0);
+			bottom.animate().alpha(0).setDuration(500l);
+		}
 	}
 
 }

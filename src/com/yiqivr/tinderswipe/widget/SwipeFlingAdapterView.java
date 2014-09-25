@@ -3,7 +3,6 @@ package com.yiqivr.tinderswipe.widget;
 import android.content.Context;
 import android.database.DataSetObserver;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Adapter;
@@ -11,7 +10,7 @@ import android.widget.FrameLayout;
 
 import com.yiqivr.tinderswipe.widget.FlingCardListener.SWIPEMODE;
 
-public class SwipeFlingAdapterView extends BaseFlingAdapterView implements HelperFlingListener {
+public class SwipeFlingAdapterView extends BaseFlingAdapterView implements HelperFlingWithProportionListener {
 
 	private Adapter mAdapter;
 	private int maxVisible = 4;
@@ -243,19 +242,19 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView implements Helpe
 //			Log.d("", "lastObjectInStack = " + lastObjectInStack);
 			View tv = getChildAt(lastObjectInStack);
 			View nextTv = null;
-			if(getChildCount() > 1){
+			if (getChildCount() > 1) {
 				nextTv = getChildAt(lastObjectInStack - 1);
 			}
-			
+
 			if (tv != null) {
 				FlingCardListener flingCardListener = new FlingCardListener(swipeMode, tv, nextTv, getWidth(),
 						getHeight(), tv.getX(), tv.getY(), tv.getHeight(), tv.getWidth(), mAdapter.getItem(0), this);
 				tv.setOnTouchListener(flingCardListener);
 			}
-			
+
 		}
 	}
-	
+
 	public void setMaxVisible(int maxVisible) {
 		this.maxVisible = maxVisible;
 	}
@@ -267,6 +266,21 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView implements Helpe
 	@Override
 	public LayoutParams generateLayoutParams(AttributeSet attrs) {
 		return new FrameLayout.LayoutParams(getContext(), attrs);
+	}
+
+	@Override
+	public void flingOccurPercent(View selfView, int percent, boolean swipeTop) {
+		if (tbFlingListener != null && tbFlingListener instanceof OnTopBottomFlingWithProportionListener) {
+			((OnTopBottomFlingWithProportionListener) tbFlingListener).onFlingSuccessPercent(selfView, percent,
+					swipeTop);
+		}
+	}
+
+	@Override
+	public void flingResetOrigin(View selfView) {
+		if (tbFlingListener != null && tbFlingListener instanceof OnTopBottomFlingWithProportionListener) {
+			((OnTopBottomFlingWithProportionListener) tbFlingListener).onFlingResetOrigin(selfView);
+		}
 	}
 
 }

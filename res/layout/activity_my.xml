@@ -9,7 +9,7 @@
         android:layout_height="200dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="-170dp"
+        android:layout_marginBottom="-160dp"
         android:background="@drawable/card"
         android:gravity="center"
         android:textColor="@android:color/white"
@@ -22,5 +22,12 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         tools:context=".MyActivity" />
+    
+    <ImageView 
+        android:layout_height="30dp"
+        android:layout_width="230dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/collect_fore"/>
 
 </RelativeLayout>
