@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
@@ -41,6 +42,9 @@ public class FlingCardListener implements View.OnTouchListener {
 	}
 
 	private SWIPEMODE swipeMode;
+
+	private VelocityTracker vTracker;
+	boolean velocityReach = false;
 
 	public FlingCardListener(SWIPEMODE swipeMode, View frame, View nextFrame, int parentWidth, int parentHeight,
 			float originalX, float originalY, int originalHeight, int originalWidth, Object itemAtPosition,
@@ -94,11 +98,25 @@ public class FlingCardListener implements View.OnTouchListener {
 				}
 			}
 
+			if (vTracker == null) {
+				vTracker = VelocityTracker.obtain();
+			} else {
+				vTracker.clear();
+			}
+			vTracker.addMovement(event);
+
 			break;
 
 		case MotionEvent.ACTION_UP:
 			mActivePointerId = INVALID_POINTER_ID;
-			resetCardViewOnStack();
+			if (velocityReach) {
+				helperFlingListener.flingOccurPercent(frame, 100, false);
+				bottomSelectedEvent();
+			} else {
+				resetCardViewOnStack();
+			}
+			vTracker.recycle();
+			velocityReach = false;
 			break;
 
 		case MotionEvent.ACTION_POINTER_DOWN:
@@ -166,14 +184,21 @@ public class FlingCardListener implements View.OnTouchListener {
 
 			helperFlingListener.flingOccurPercent(frame, getMoveDisPercent(), distOriginalY < 0);
 
+			vTracker.addMovement(event);
+			vTracker.computeCurrentVelocity(100);
+			float yVelocity = vTracker.getYVelocity();
+			if (yVelocity > 550f) {
+				velocityReach = true;
+			}
 			break;
 
 		case MotionEvent.ACTION_CANCEL: {
 			mActivePointerId = INVALID_POINTER_ID;
+			vTracker.recycle();
+			velocityReach = false;
 			break;
 		}
 		}
-
 		return true;
 	}
 
@@ -203,8 +228,7 @@ public class FlingCardListener implements View.OnTouchListener {
 			}
 		} else {
 			if (distOriginalY > originalHeight / 2) {
-				setUpNextFrame(1f, true);
-				onBottomSelected();
+				bottomSelectedEvent();
 			} else if (distOriginalY < 0 && Math.abs(distOriginalY) > originalHeight / 2) {
 				setUpNextFrame(1f, true);
 				onTopSelected();
@@ -212,6 +236,11 @@ public class FlingCardListener implements View.OnTouchListener {
 				resetOrigin();
 			}
 		}
+	}
+
+	protected void bottomSelectedEvent() {
+		setUpNextFrame(1f, true);
+		onBottomSelected();
 	}
 
 	public int getMoveDisPercent() {
