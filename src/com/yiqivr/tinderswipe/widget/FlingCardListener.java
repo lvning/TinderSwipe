@@ -115,7 +115,11 @@ public class FlingCardListener implements View.OnTouchListener {
 			} else {
 				resetCardViewOnStack();
 			}
-			vTracker.recycle();
+			try {
+				vTracker.recycle();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			velocityReach = false;
 			break;
 
@@ -194,7 +198,11 @@ public class FlingCardListener implements View.OnTouchListener {
 
 		case MotionEvent.ACTION_CANCEL: {
 			mActivePointerId = INVALID_POINTER_ID;
-			vTracker.recycle();
+			try {
+				vTracker.recycle();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			velocityReach = false;
 			break;
 		}
