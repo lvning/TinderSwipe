@@ -2,25 +2,23 @@ package com.yiqivr.tinderswipe;
 
 import java.util.ArrayList;
 
-import android.R.animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.OvershootInterpolator;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.yiqivr.tinderswipe.widget.CircleProgress;
 import com.yiqivr.tinderswipe.widget.FlingCardListener.SWIPEMODE;
 import com.yiqivr.tinderswipe.widget.OnLeftRightFlingListener;
-import com.yiqivr.tinderswipe.widget.OnTopBottomFlingListener;
 import com.yiqivr.tinderswipe.widget.OnTopBottomFlingWithProportionListener;
 import com.yiqivr.tinderswipe.widget.SwipeFlingAdapterView;
 
@@ -29,6 +27,8 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 	private ArrayList<String> al;
 	private MyAdapter adapter;
 	private TextView boxPic;
+
+	private boolean addMoreExcuting;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +39,7 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 		boxPic = (TextView) findViewById(R.id.boxpic);
 
 		al = new ArrayList<String>();
-		for (int i = 1; i < 20; i++) {
+		for (int i = 1; i < 10; i++) {
 			al.add(i + "");
 		}
 
@@ -72,6 +72,27 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 	public void onAdapterAboutToEmpty(int itemsInAdapter) {
 		// Ask for more data here
 		System.out.println("Almost empty!!! itemsInAdapter = " + itemsInAdapter);
+		netWorkSimulation();
+	}
+
+	private void netWorkSimulation() {
+		if (addMoreExcuting)
+			return;
+		addMoreExcuting = true;
+		new Handler().postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				ArrayList<String> moreData = new ArrayList<String>();
+				for (int i = 10; i < 20; i++) {
+					moreData.add(i + "");
+				}
+
+				al.addAll(moreData);
+				adapter.notifyDataSetChanged();
+				addMoreExcuting = false;
+			}
+		}, 1000);
 	}
 
 	@Override
