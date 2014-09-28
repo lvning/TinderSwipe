@@ -226,7 +226,7 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView implements Helpe
 
 			switch (verticalGravity) {
 			case Gravity.CENTER_VERTICAL:
-				childTop = (getHeight() + getPaddingTop() - getPaddingBottom() - width) / 2 + lp.topMargin
+				childTop = (getHeight() + getPaddingTop() - getPaddingBottom() - height) / 2 + lp.topMargin
 						- lp.bottomMargin;
 				break;
 			case Gravity.BOTTOM:
