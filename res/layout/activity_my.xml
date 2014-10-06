@@ -22,12 +22,47 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         tools:context=".MyActivity" />
-    
-    <ImageView 
-        android:layout_height="30dp"
-        android:layout_width="230dp"
+
+    <View
+        android:id="@+id/shadow"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="#99000000"
+        android:visibility="gone" />
+
+    <include
+        android:id="@+id/boxpic_out2"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/collect_fore"/>
+        android:layout_marginBottom="-160dp"
+        layout="@layout/item" />
+
+    <include
+        android:id="@+id/boxpic_out1"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="-160dp"
+        layout="@layout/item" />
+
+    <com.yiqivr.tinderswipe.widget.MultiViewPager
+        android:id="@+id/viewpager"
+        android:layout_width="fill_parent"
+        android:layout_height="200dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="60dp"
+        android:visibility="visible" />
+
+    <ImageView
+        android:id="@+id/collect_box"
+        android:layout_width="230dp"
+        android:layout_height="30dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/collect_fore" />
 
 </RelativeLayout>
