@@ -272,23 +272,6 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 
 	}
 
-	private Animation getAnim(boolean isFirst) {
-		int duration = 2000;
-		Animation animation;
-		if (isFirst) {
-			animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f,
-					Animation.RELATIVE_TO_SELF, 1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
-			animation.setDuration(duration);
-		} else {
-			animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, -1.0f, Animation.RELATIVE_TO_SELF, 0.0f,
-					Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f);
-			animation.setStartOffset(duration);
-			animation.setDuration(duration);
-		}
-
-		return animation;
-	}
-
 	@Override
 	public void onFlingSuccessPercent(View selfView, int percent, boolean flingTop) {
 		CircleProgress top = (CircleProgress) selfView.findViewById(R.id.top_progress);
