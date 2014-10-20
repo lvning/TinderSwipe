@@ -254,10 +254,18 @@ public class SwipeFlingAdapterView extends BaseFlingAdapterView implements Helpe
 			if (tv != null) {
 				FlingCardListener flingCardListener = new FlingCardListener(swipeMode, tv, nextTv, getWidth(),
 						getHeight(), tv.getX(), tv.getY(), tv.getHeight(), tv.getWidth(), mAdapter.getItem(0), this);
+				if(bottomFinalPosX != 0 && bottomFinalPosY != 0)
+					flingCardListener.setBottomFinalPos(bottomFinalPosX, bottomFinalPosY);
 				tv.setOnTouchListener(flingCardListener);
 			}
-
 		}
+	}
+	
+	private float bottomFinalPosX, bottomFinalPosY;
+	
+	public void setBottomFinalPos(float bottomFinalPosX, float bottomFinalPosY) {
+		this.bottomFinalPosX = bottomFinalPosX;
+		this.bottomFinalPosY = bottomFinalPosY;
 	}
 
 	public void setMaxVisible(int maxVisible) {

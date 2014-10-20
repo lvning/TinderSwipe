@@ -44,7 +44,9 @@ public class FlingCardListener implements View.OnTouchListener {
 	private SWIPEMODE swipeMode;
 
 	private VelocityTracker vTracker;
-	boolean velocityReach = false;
+	private boolean velocityReach = false;
+
+	private float bottomFinalPosX, bottomFinalPosY;
 
 	public FlingCardListener(SWIPEMODE swipeMode, View frame, View nextFrame, int parentWidth, int parentHeight,
 			float originalX, float originalY, int originalHeight, int originalWidth, Object itemAtPosition,
@@ -310,9 +312,16 @@ public class FlingCardListener implements View.OnTouchListener {
 				}).rotation(getExitRotation());
 	}
 
+	public void setBottomFinalPos(float bottomFinalPosX, float bottomFinalPosY) {
+		this.bottomFinalPosX = bottomFinalPosX;
+		this.bottomFinalPosY = bottomFinalPosY;
+	}
+
 	public void onBottomSelected() {
-		this.frame.animate().setDuration(100).setInterpolator(new AccelerateInterpolator()).x(originalX)
-				.y(3 * originalHeight).setListener(new AnimatorListenerAdapter() {
+		this.frame.animate().setDuration(100).setInterpolator(new AccelerateInterpolator())
+				.x(bottomFinalPosX == 0 ? originalX : bottomFinalPosX)
+				.y(bottomFinalPosY == 0 ? 3 * originalHeight : bottomFinalPosY)
+				.setListener(new AnimatorListenerAdapter() {
 					@Override
 					public void onAnimationEnd(Animator animation) {
 

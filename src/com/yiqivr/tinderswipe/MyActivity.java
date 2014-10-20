@@ -2,28 +2,24 @@ package com.yiqivr.tinderswipe;
 
 import java.util.ArrayList;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.OvershootInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.yiqivr.tinderswipe.widget.BoxLayout;
 import com.yiqivr.tinderswipe.widget.CircleProgress;
 import com.yiqivr.tinderswipe.widget.FlingCardListener.SWIPEMODE;
-import com.yiqivr.tinderswipe.widget.MultiViewPager;
 import com.yiqivr.tinderswipe.widget.OnLeftRightFlingListener;
 import com.yiqivr.tinderswipe.widget.OnTopBottomFlingWithProportionListener;
 import com.yiqivr.tinderswipe.widget.SwipeFlingAdapterView;
@@ -34,34 +30,34 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 	private ArrayList<View> pagerView;
 	private MyAdapter adapter;
 	private MyPagerAdapter pagerAdapter;
-	private TextView boxPic;
+	private BoxLayout boxLayout;
 
 	private boolean addMoreExcuting;
 
-	private MultiViewPager pager;
-	private View out1, out2, shadow;
+	private ViewPager pager;
+	private View shadow;
 	private final int duration = 500;
+	private final int OutInduration = 500;
+
+	private float transByY, transByX;
+	private View box;
+	private SwipeFlingAdapterView flingContainer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_my);
 
-		SwipeFlingAdapterView flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
-		boxPic = (TextView) findViewById(R.id.boxpic);
-		pager = (MultiViewPager) findViewById(R.id.viewpager);
-		out1 = findViewById(R.id.boxpic_out1);
-		out2 = findViewById(R.id.boxpic_out2);
+		flingContainer = (SwipeFlingAdapterView) findViewById(R.id.frame);
+		boxLayout = (BoxLayout) findViewById(R.id.boxlayout);
+		pager = (ViewPager) findViewById(R.id.viewpager);
 		shadow = findViewById(R.id.shadow);
+		box = findViewById(R.id.collect_box);
 
 		al = new ArrayList<String>();
 		pagerView = new ArrayList<View>();
 		for (int i = 1; i < 10; i++) {
 			al.add(i + "");
-			View v = LayoutInflater.from(MyActivity.this).inflate(R.layout.item, null);
-			v.findViewById(R.id.bottom_progress).setVisibility(View.GONE);
-			v.findViewById(R.id.top_progress).setVisibility(View.GONE);
-			pagerView.add(v);
 		}
 
 		flingContainer.setSwipeMode(SWIPEMODE.UP_DOWN);
@@ -72,75 +68,128 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 		flingContainer.setAdapter(adapter);
 
 		pager.setVisibility(View.GONE);
-		out1.setAlpha(0);
-		out2.setAlpha(0);
 
-		findViewById(R.id.collect_box).setOnClickListener(new OnClickListener() {
+		box.setOnClickListener(boxClickListener);
 
-			@SuppressLint("NewApi")
-			@Override
-			public void onClick(View v) {
+		shadow.setOnClickListener(shadowClickListener);
 
-				pager.setAlpha(0);
-				shadow.setAlpha(0);
-				shadow.setVisibility(View.VISIBLE);
-				pager.setVisibility(View.VISIBLE);
-				pagerAdapter = new MyPagerAdapter();
-				pager.setPageMargin(-300);
-				pager.setAdapter(pagerAdapter);
-				pager.post(new Runnable() {
-
-					@Override
-					public void run() {
-						out1.setAlpha(1);
-						out2.setAlpha(1);
-						out1.clearAnimation();
-						out2.clearAnimation();
-						int transByY = pager.getTop() - out1.getTop();
-						final int bransByX = pager.getChildAt(1).getLeft() - pager.getChildAt(0).getLeft();
-						out1.animate().translationY(transByY).setDuration(duration);
-						shadow.animate().alpha(1).setDuration(2 * duration);
-						out2.animate().translationY(transByY).setDuration(duration).withEndAction(new Runnable() {
-
-							@Override
-							public void run() {
-								out2.animate().translationX(bransByX).setDuration(duration)
-										.withEndAction(new Runnable() {
-
-											@Override
-											public void run() {
-												pager.setAlpha(1);
-												shadow.setAlpha(1);
-												out1.setAlpha(0);
-												out2.setAlpha(0);
-											}
-										});
-							}
-						});
-					}
-				});
-			}
-		});
-
-		shadow.setOnClickListener(new OnClickListener() {
-
-			@SuppressLint("NewApi")
-			@Override
-			public void onClick(View v) {
-				Log.v("", "shadow clicked!!!");
-				shadow.animate().alpha(0).setDuration(2 * duration).withEndAction(new Runnable() {
-
-					@Override
-					public void run() {
-						shadow.setVisibility(View.GONE);
-					}
-				});
-				Log.e("", "pager.getChildCount() = " + pager.getChildCount());
-				
-			}
-		});
-		
 	}
+
+	private OnClickListener boxClickListener = new View.OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			if (pagerView.size() == 0) {
+				return;
+			}
+			box.setOnClickListener(null);
+			pager.setAlpha(0);
+			shadow.setAlpha(0);
+			shadow.setVisibility(View.VISIBLE);
+			pager.setVisibility(View.VISIBLE);
+			pagerAdapter = new MyPagerAdapter();
+			pager.setPageMargin(-300);
+			pager.setAdapter(pagerAdapter);
+
+			boxLayout.bringToFront();
+			box.bringToFront();
+
+			pager.post(new Runnable() {
+
+				@Override
+				public void run() {
+					transByY = pager.getTop() - boxLayout.getTop() - boxLayout.getChildTop();
+					int collectItemsSize = pagerView.size();
+					int animType = BoxLayout.ONE_COLLECT_ANIM;
+					switch (collectItemsSize) {
+					case 1:
+						animType = BoxLayout.ONE_COLLECT_ANIM;
+						break;
+					case 2:
+						animType = BoxLayout.TWO_COLLECT_ANIM;
+						transByX = pager.getChildAt(1).getLeft() - pager.getChildAt(0).getLeft();
+						break;
+					default:
+						animType = BoxLayout.MORE_COLLECT_ANIM;
+						transByX = pager.getChildAt(1).getLeft() - pager.getChildAt(0).getLeft();
+						break;
+					}
+
+					boxLayout.popOut(animType, transByY, transByX, new Runnable() {
+
+						@Override
+						public void run() {
+							flingContainer.bringToFront();
+							shadow.bringToFront();
+							pager.setAlpha(1);
+							pager.bringToFront();
+							box.bringToFront();
+							findViewById(R.id.rl_content).requestLayout();
+							shadow.setOnClickListener(shadowClickListener);
+							pager.setOnClickListener(shadowClickListener);
+						}
+					});
+
+					shadow.animate().alpha(1).setDuration(2 * OutInduration);
+				}
+			});
+
+		}
+	};
+
+	private OnClickListener shadowClickListener = new View.OnClickListener() {
+
+		@SuppressLint("NewApi")
+		@Override
+		public void onClick(View v) {
+			shadow.setOnClickListener(null);
+			shadow.animate().alpha(0).setDuration(2 * duration).withEndAction(new Runnable() {
+
+				@Override
+				public void run() {
+					shadow.setVisibility(View.GONE);
+				}
+			});
+			Log.e("", "pager.getChildCount() = " + pager.getChildCount());
+
+			int animType = BoxLayout.MORE_PAGER_ANIM_LEFT;
+			int pagerChildCount = pager.getChildCount();
+			pager.setVisibility(View.GONE);
+			shadow.bringToFront();
+			boxLayout.bringToFront();
+			box.bringToFront();
+			switch (pagerChildCount) {
+			case 1:
+				animType = BoxLayout.ONE_PAGER_ANIM;
+				break;
+			case 2:
+				boolean leftCenter = (pager.getCurrentItem() == 0);
+				if (pagerView.size() > 2) {
+					animType = leftCenter ? BoxLayout.MORE_PAGER_ANIM_LEFT : BoxLayout.MORE_PAGER_ANIM_RIGHT;
+				} else {
+					animType = leftCenter ? BoxLayout.TWO_PAGER_ANIM_LEFT : BoxLayout.TWO_PAGER_ANIM_RIGHT;
+				}
+				break;
+			default:
+				animType = BoxLayout.MORE_PAGER_ANIM_OTHER;
+				break;
+			}
+			boxLayout.setReadyPullIn(animType, transByY, transByX, new Runnable() {
+
+				@Override
+				public void run() {
+					boxLayout.bringToFront();
+					flingContainer.bringToFront();
+					shadow.bringToFront();
+					box.bringToFront();
+					findViewById(R.id.rl_content).requestLayout();
+					box.setOnClickListener(boxClickListener);
+				}
+			});
+
+		}
+
+	};
 
 	@Override
 	public void removeFirstObjectInAdapter() {
@@ -188,25 +237,26 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 
 	@Override
 	public void onTopCardExit(Object dataObject) {
-//		Toast.makeText(this, "Swipe Top:" + dataObject.toString(), Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
 	public void onBottomCardExit(Object dataObject) {
-//		Toast.makeText(this, "Swipe Bottom:" + dataObject.toString(), Toast.LENGTH_SHORT).show();
-		boxPic.setBackgroundResource(Integer.valueOf(dataObject.toString()) % 2 == 0 ? R.drawable.card
-				: R.drawable.card2);
-		boxPic.setText(dataObject.toString());
-
-		ObjectAnimator transAnim = ObjectAnimator.ofFloat(boxPic, "translationY", 150f, 0f);
-		transAnim.setInterpolator(new OvershootInterpolator());
-		transAnim.setDuration(250);
-		ObjectAnimator rotateAnim = ObjectAnimator.ofFloat(boxPic, "rotation", 0f, -5f);
-		rotateAnim.setInterpolator(new OvershootInterpolator());
-		rotateAnim.setDuration(150);
-		AnimatorSet animSet = new AnimatorSet();
-		animSet.playTogether(rotateAnim, transAnim);
-		animSet.start();
+		if (pagerView.size() == 0) {
+			boxLayout
+					.setBackImage(Integer.valueOf(dataObject.toString()) % 2 == 0 ? R.drawable.card : R.drawable.card2);
+		} else if (pagerView.size() == 1) {
+			boxLayout.setCenterImage(Integer.valueOf(dataObject.toString()) % 2 == 0 ? R.drawable.card
+					: R.drawable.card2);
+		} else {
+			boxLayout
+					.setForeImage(Integer.valueOf(dataObject.toString()) % 2 == 0 ? R.drawable.card : R.drawable.card2);
+		}
+		View v = LayoutInflater.from(MyActivity.this).inflate(R.layout.no_circle_item, null);
+		TextView tv = (TextView) v.findViewById(R.id.helloText);
+		tv.setText(dataObject.toString());
+		pagerView.add(v);
+		if (pagerAdapter != null)
+			pagerAdapter.notifyDataSetChanged();
 	}
 
 	private class MyAdapter extends BaseAdapter {
