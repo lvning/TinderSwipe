@@ -88,7 +88,7 @@ public class MyActivity extends Activity implements OnLeftRightFlingListener, On
 			shadow.setVisibility(View.VISIBLE);
 			pager.setVisibility(View.VISIBLE);
 			pagerAdapter = new MyPagerAdapter();
-			pager.setPageMargin(-300);
+			pager.setPageMargin(-200);
 			pager.setAdapter(pagerAdapter);
 
 			boxLayout.bringToFront();

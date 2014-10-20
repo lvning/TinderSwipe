@@ -43,7 +43,7 @@ public class BoxLayout extends LinearLayout {
 	private View foreView, centerView, backView;
 	private boolean foreVisible, centerVisible, backVisible;
 
-	private static final long ANIM_TIME = 1200l;
+	private static final long ANIM_TIME = 600l;
 
 	public BoxLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
